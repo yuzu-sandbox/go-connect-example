@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 
@@ -33,9 +34,9 @@ func main() {
 	mux := http.NewServeMux()
 	path, handler := greetv1connect.NewGreetServiceHandler(greeter)
 	mux.Handle(path, handler)
+	c := cors.Default()
+	cHandler := c.Handler(h2c.NewHandler(mux, &http2.Server{}))
 	http.ListenAndServe(
-		"localhost:8080",
-		// Use h2c so we can serve HTTP/2 without TLS.
-		h2c.NewHandler(mux, &http2.Server{}),
+		"localhost:8080", cHandler,
 	)
 }
